@@ -47,6 +47,7 @@ module SlimLsp
       @documents = {}
       @config = Marshal.load(Marshal.dump(DEFAULT_CONFIG))
       @workspace_root = Dir.pwd
+      @formatter = Formatter.new(config: @config, workspace_root: @workspace_root)
     end
 
     def run
@@ -139,6 +140,7 @@ module SlimLsp
       params = message['params'] || {}
       root_uri = params['rootUri'] || params['rootPath']
       @workspace_root = uri_to_path(root_uri) if root_uri
+      @formatter = Formatter.new(config: @config, workspace_root: @workspace_root)
 
       if params['initializationOptions'].is_a?(Hash)
         merge_config(params['initializationOptions'])
@@ -290,51 +292,7 @@ module SlimLsp
     end
 
     def format_text(text)
-      sort_tailwind_classes_in_attributes(text)
-    end
-
-    def sort_tailwind_classes_in_attributes(text)
-      return text unless @config.dig('tailwind', 'enabled')
-
-      text.gsub(/class\s*=\s*("([^"]*)"|'([^']*)')/) do
-        match = Regexp.last_match
-        classes = match[2] || match[3] || ''
-        quote = match[2] ? '"' : "'"
-        sorted = sort_tailwind_classes(classes)
-        "class=#{quote}#{sorted}#{quote}"
-      end
-    end
-
-    def sort_tailwind_classes(classes)
-      return classes unless @config.dig('tailwind', 'enabled')
-
-      script_path = File.expand_path('../../scripts/tailwind_sorter.mjs', __dir__)
-      payload = {
-        classes: classes,
-        tailwindConfig: resolve_path(@config.dig('tailwind', 'configPath')),
-        tailwindStylesheet: resolve_path(@config.dig('tailwind', 'stylesheetPath')),
-        baseDir: @workspace_root,
-        tailwindPreserveDuplicates: @config.dig('tailwind', 'preserveDuplicates'),
-        tailwindPreserveWhitespace: @config.dig('tailwind', 'preserveWhitespace')
-      }
-
-      node_path = @config.dig('tailwind', 'nodePath') || 'node'
-      stderr = ''
-      stdout, stderr, status = Open3.capture3(node_path, script_path, stdin_data: JSON.generate(payload))
-      return classes unless status.success?
-
-      result = JSON.parse(stdout)
-      result['classes'] || classes
-    rescue StandardError => e
-      warn("tailwind sort failed: #{e.message}\n#{stderr}")
-      classes
-    end
-
-    def resolve_path(path)
-      return nil unless path && !path.empty?
-      return path if Pathname.new(path).absolute?
-
-      File.expand_path(path, @workspace_root)
+      @formatter.format(text)
     end
 
     def uri_to_path(uri)

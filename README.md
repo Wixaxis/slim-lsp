@@ -49,6 +49,12 @@ npm install
 
 If you skip this step, the LSP still works, but class sorting is disabled.
 
+### Bundler install from Git (for Ruby projects)
+
+```ruby
+gem 'slim_lsp', git: 'https://github.com/Wixaxis/slim-lsp.git'
+```
+
 ### Bundler 4 Note
 
 Bundler 4 removed the `--path` flag. If you're using Bundler 4 (or a Ruby
@@ -69,6 +75,32 @@ mise exec ruby -- bundle _4.0.1_ install
 
 ```bash
 slim-lsp
+```
+
+## CLI
+
+Format a file (stdout):
+
+```bash
+slim-lsp --format path/to/file.slim
+```
+
+Format from stdin:
+
+```bash
+cat path/to/file.slim | slim-lsp --format -
+```
+
+Format and overwrite:
+
+```bash
+slim-lsp --format path/to/file.slim --write
+```
+
+Tailwind options for CLI:
+
+```bash
+slim-lsp --format path/to/file.slim --tailwind-config tailwind.config.js --tailwind-stylesheet app/assets/stylesheets/application.tailwind.css
 ```
 
 ## Neovim (nvim-lspconfig)

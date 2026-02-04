@@ -11,6 +11,76 @@ else
   require 'rubygems'
 end
 
+require 'optparse'
+
 require_relative '../lib/slim_lsp'
+
+options = {
+  format: false,
+  write: false,
+  config_path: nil,
+  stylesheet_path: nil,
+  node_path: nil
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: slim-lsp [options]'
+
+  opts.on('--version', 'Print version and exit') do
+    puts SlimLsp::VERSION
+    exit(0)
+  end
+
+  opts.on('--format [PATH]', 'Format Slim from PATH (or stdin) and output to stdout') do |path|
+    options[:format] = true
+    options[:format_path] = path
+  end
+
+  opts.on('--write', 'Write formatted output back to file when using --format PATH') do
+    options[:write] = true
+  end
+
+  opts.on('--tailwind-config PATH', 'Path to tailwind.config.js') do |path|
+    options[:config_path] = path
+  end
+
+  opts.on('--tailwind-stylesheet PATH', 'Path to Tailwind stylesheet') do |path|
+    options[:stylesheet_path] = path
+  end
+
+  opts.on('--node PATH', 'Path to node executable') do |path|
+    options[:node_path] = path
+  end
+end
+
+parser.parse!(ARGV)
+
+if options[:format]
+  input = nil
+  source_path = options[:format_path]
+
+  if source_path.nil? || source_path == '-'
+    input = STDIN.read
+  else
+    input = File.read(source_path)
+  end
+
+  config = Marshal.load(Marshal.dump(SlimLsp::Server::DEFAULT_CONFIG))
+  config['tailwind']['configPath'] = options[:config_path] if options[:config_path]
+  config['tailwind']['stylesheetPath'] = options[:stylesheet_path] if options[:stylesheet_path]
+  config['tailwind']['nodePath'] = options[:node_path] if options[:node_path]
+
+  workspace_root = source_path && source_path != '-' ? File.expand_path(File.dirname(source_path)) : Dir.pwd
+  formatter = SlimLsp::Formatter.new(config: config, workspace_root: workspace_root)
+  formatted = formatter.format(input)
+
+  if options[:write] && source_path && source_path != '-'
+    File.write(source_path, formatted)
+  else
+    puts formatted
+  end
+
+  exit(0)
+end
 
 SlimLsp::Server.new.run
