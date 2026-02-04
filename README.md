@@ -127,6 +127,11 @@ slim-lsp --format path/to/file.slim --tailwind-config tailwind.config.js --tailw
 bundle exec ruby -Itest test/*_test.rb
 ```
 
+### Test Fixtures
+
+Formatter fixtures live in `test/fixtures/format/` and include input/expected Slim templates.
+Diagnostics fixtures live in `test/fixtures/diagnostics/`.
+
 ## Neovim (nvim-lspconfig)
 
 ```lua

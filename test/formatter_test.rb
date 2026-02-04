@@ -48,4 +48,34 @@ class FormatterTest < Minitest::Test
     refute_nil match, 'Expected class attribute in formatted output.'
     assert_equal expected, match[1]
   end
+
+  def test_format_matches_fixture_simple
+    input = File.read(fixture_path('format/input_simple.slim'))
+    expected = File.read(fixture_path('format/expected_simple.slim'))
+
+    formatted = formatter.format(input)
+    assert_equal expected, formatted
+  end
+
+  def test_format_matches_fixture_multi_attrs
+    input = File.read(fixture_path('format/input_multi_attrs.slim'))
+    expected = File.read(fixture_path('format/expected_multi_attrs.slim'))
+
+    formatted = formatter.format(input)
+    assert_equal expected, formatted
+  end
+
+  private
+
+  def formatter
+    config = Marshal.load(Marshal.dump(SlimLsp::Server::DEFAULT_CONFIG))
+    config['tailwind']['enabled'] = true
+    config['tailwind']['nodePath'] = ENV['NODE_PATH'] if ENV['NODE_PATH'] && !ENV['NODE_PATH'].empty?
+
+    SlimLsp::Formatter.new(config: config, workspace_root: Dir.pwd, io_err: StringIO.new)
+  end
+
+  def fixture_path(relative_path)
+    File.expand_path(File.join('fixtures', relative_path), __dir__)
+  end
 end
