@@ -19,7 +19,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
+          bundler-cache: false
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -30,5 +30,20 @@ jobs:
       - name: Install npm deps
         run: npm install
 
+      - name: Install Ruby deps
+        run: |
+          bundle config set path vendor/bundle
+          bundle config set frozen false
+          bundle install
+
       - name: Run tests
         run: bundle exec ruby -Itest test/*_test.rb
+
+      - name: Run CLI checks
+        run: |
+          cat <<'EOF' > /tmp/sample.slim
+          div class="font-bold text-center"
+            | hello
+          EOF
+          bundle exec slim-lsp --diagnose /tmp/sample.slim
+          bundle exec slim-lsp --format /tmp/sample.slim --check
