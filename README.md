@@ -15,9 +15,16 @@ A small Ruby-based LSP server for Slim templates. It focuses on:
 ## Install
 
 ```bash
+bundle config set path 'vendor/bundle'
 bundle install
 npm install
 ```
+
+### Bundler 4 Note
+
+Bundler 4 removed the `--path` flag. If you're using Bundler 4 (or a Ruby
+version manager like mise), run `bundle config set path 'vendor/bundle'`
+before `bundle install`.
 
 ## Run
 
