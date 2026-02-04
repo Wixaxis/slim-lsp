@@ -18,6 +18,8 @@ require_relative '../lib/slim_lsp'
 options = {
   format: false,
   write: false,
+  check: false,
+  diagnose: false,
   config_path: nil,
   stylesheet_path: nil,
   node_path: nil
@@ -27,7 +29,19 @@ parser = OptionParser.new do |opts|
   opts.banner = 'Usage: slim-lsp [options]'
 
   opts.on('--version', 'Print version and exit') do
-    puts SlimLsp::VERSION
+    sha = begin
+      if ENV['SLIM_LSP_GIT_SHA']
+        ENV['SLIM_LSP_GIT_SHA']
+      elsif File.directory?(File.join(repo_root, '.git'))
+        `git -C #{repo_root} rev-parse --short HEAD`.strip
+      end
+    rescue StandardError
+      nil
+    end
+
+    version = SlimLsp::VERSION
+    version = "#{version}+#{sha}" if sha && !sha.empty?
+    puts version
     exit(0)
   end
 
@@ -38,6 +52,15 @@ parser = OptionParser.new do |opts|
 
   opts.on('--write', 'Write formatted output back to file when using --format PATH') do
     options[:write] = true
+  end
+
+  opts.on('--check', 'Exit with status 1 if formatting would change output') do
+    options[:check] = true
+  end
+
+  opts.on('--diagnose [PATH]', 'Parse Slim and exit non-zero if syntax errors are found') do |path|
+    options[:diagnose] = true
+    options[:diagnose_path] = path
   end
 
   opts.on('--tailwind-config PATH', 'Path to tailwind.config.js') do |path|
@@ -54,6 +77,23 @@ parser = OptionParser.new do |opts|
 end
 
 parser.parse!(ARGV)
+
+if options[:diagnose]
+  source_path = options[:diagnose_path]
+  input = if source_path.nil? || source_path == '-'
+            STDIN.read
+          else
+            File.read(source_path)
+          end
+
+  begin
+    Slim::Engine.new.call(input)
+    exit(0)
+  rescue StandardError => e
+    warn(e.message)
+    exit(1)
+  end
+end
 
 if options[:format]
   input = nil
@@ -73,6 +113,10 @@ if options[:format]
   workspace_root = source_path && source_path != '-' ? File.expand_path(File.dirname(source_path)) : Dir.pwd
   formatter = SlimLsp::Formatter.new(config: config, workspace_root: workspace_root)
   formatted = formatter.format(input)
+
+  if options[:check]
+    exit(formatted == input ? 0 : 1)
+  end
 
   if options[:write] && source_path && source_path != '-'
     File.write(source_path, formatted)

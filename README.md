@@ -97,10 +97,28 @@ Format and overwrite:
 slim-lsp --format path/to/file.slim --write
 ```
 
+Check if formatting is needed (exit 1 on diff):
+
+```bash
+slim-lsp --format path/to/file.slim --check
+```
+
+Diagnose syntax errors:
+
+```bash
+slim-lsp --diagnose path/to/file.slim
+```
+
 Tailwind options for CLI:
 
 ```bash
 slim-lsp --format path/to/file.slim --tailwind-config tailwind.config.js --tailwind-stylesheet app/assets/stylesheets/application.tailwind.css
+```
+
+## Tests
+
+```bash
+bundle exec ruby -Itest test/*_test.rb
 ```
 
 ## Neovim (nvim-lspconfig)
