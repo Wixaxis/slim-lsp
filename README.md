@@ -26,6 +26,16 @@ Bundler 4 removed the `--path` flag. If you're using Bundler 4 (or a Ruby
 version manager like mise), run `bundle config set path 'vendor/bundle'`
 before `bundle install`.
 
+### mise Ruby (Recommended if you use mise)
+
+If you use mise to manage Ruby, run the installs through mise so the gems land
+in the same Ruby version your editor will use:
+
+```bash
+mise exec ruby -- bundle _4.0.1_ config set path 'vendor/bundle'
+mise exec ruby -- bundle _4.0.1_ install
+```
+
 ## Run
 
 ```bash
@@ -70,6 +80,30 @@ lspconfig.slim_lsp.setup({})
 3. Replace `/absolute/path/to/slim-lsp` with the real path to this repo.
 4. Restart Neovim and open a `.slim` file.
 
+### Neovim (built-in `vim.lsp.config`)
+
+If you're using Neovim's built-in LSP config (0.11+), you can register and
+enable the server without `lspconfig`:
+
+```lua
+local config_root = vim.fn.stdpath('config')
+
+vim.lsp.config('slim_lsp', {
+  cmd = { '/absolute/path/to/ruby', config_root .. '/slim-lsp/bin/slim-lsp' },
+  cmd_env = {
+    BUNDLE_GEMFILE = config_root .. '/slim-lsp/Gemfile',
+    BUNDLE_PATH = config_root .. '/slim-lsp/vendor/bundle',
+  },
+  filetypes = { 'slim' },
+  root_dir = function(bufnr)
+    return vim.fs.root(bufnr, { 'Gemfile', '.git' }) or vim.fn.getcwd()
+  end,
+  autostart = true,
+})
+
+if vim.lsp.enable then vim.lsp.enable('slim_lsp') end
+```
+
 ## Neovim (lazy.nvim)
 
 ```lua
@@ -112,6 +146,24 @@ cd slim-lsp
 bundle install
 npm install
 ```
+
+## Troubleshooting
+
+### LSP doesn't start in Neovim
+
+1. Confirm the server is registered and enabled:
+   - `:LspInfo` should list `slim_lsp` under **Enabled Configurations**.
+2. Confirm the executable runs:
+   - `:lua print(vim.fn.executable('/absolute/path/to/slim-lsp/bin/slim-lsp'))`
+3. Check the LSP log:
+   - `:edit ~/.local/state/nvim/lsp.log`
+
+### Bundler can't find gems
+
+If you see `Bundler::GemNotFound` in the LSP log, the server is using a Ruby
+that doesn't match where the gems were installed. Fix by installing with the
+same Ruby your editor uses (e.g., `mise exec ruby -- bundle _4.0.1_ install`),
+or by running the LSP with an explicit Ruby path.
 
 ## What It Does
 
