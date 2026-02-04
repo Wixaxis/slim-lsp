@@ -145,6 +145,10 @@ module SlimLsp
       end
 
       result = {
+        serverInfo: {
+          name: 'slim-lsp',
+          version: SlimLsp::VERSION
+        },
         capabilities: {
           textDocumentSync: {
             openClose: true,

@@ -2,8 +2,14 @@
 # frozen_string_literal: true
 
 repo_root = File.expand_path('..', __dir__)
-ENV['BUNDLE_GEMFILE'] ||= File.join(repo_root, 'Gemfile')
-require 'bundler/setup'
+
+if File.exist?(File.join(repo_root, 'Gemfile'))
+  ENV['BUNDLE_GEMFILE'] ||= File.join(repo_root, 'Gemfile')
+  require 'bundler/setup'
+else
+  # Installed as a gem: rely on RubyGems to resolve dependencies.
+  require 'rubygems'
+end
 
 require_relative '../lib/slim_lsp'
 

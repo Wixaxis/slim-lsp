@@ -14,11 +14,40 @@ A small Ruby-based LSP server for Slim templates. It focuses on:
 
 ## Install
 
+You can use it in two ways:
+
+### 1) As a local clone (recommended during development)
+
 ```bash
 bundle config set path 'vendor/bundle'
 bundle install
 npm install
 ```
+
+### 2) As a gem from a git repo
+
+```bash
+gem install specific_install
+gem specific_install https://github.com/Wixaxis/slim-lsp.git
+```
+
+#### Tailwind sorting when installed as a gem
+
+Tailwind class sorting requires a Node dependency. RubyGems does not run `npm install`,
+so you need one extra step:
+
+```bash
+gem which slim_lsp
+```
+
+That will show the gem path. Then:
+
+```bash
+cd /path/to/gem
+npm install
+```
+
+If you skip this step, the LSP still works, but class sorting is disabled.
 
 ### Bundler 4 Note
 
@@ -39,7 +68,7 @@ mise exec ruby -- bundle _4.0.1_ install
 ## Run
 
 ```bash
-bin/slim-lsp
+slim-lsp
 ```
 
 ## Neovim (nvim-lspconfig)
@@ -89,11 +118,7 @@ enable the server without `lspconfig`:
 local config_root = vim.fn.stdpath('config')
 
 vim.lsp.config('slim_lsp', {
-  cmd = { '/absolute/path/to/ruby', config_root .. '/slim-lsp/bin/slim-lsp' },
-  cmd_env = {
-    BUNDLE_GEMFILE = config_root .. '/slim-lsp/Gemfile',
-    BUNDLE_PATH = config_root .. '/slim-lsp/vendor/bundle',
-  },
+  cmd = { 'slim-lsp' },
   filetypes = { 'slim' },
   root_dir = function(bufnr)
     return vim.fs.root(bufnr, { 'Gemfile', '.git' }) or vim.fn.getcwd()
@@ -114,7 +139,7 @@ if vim.lsp.enable then vim.lsp.enable('slim_lsp') end
     local lspconfig = require("lspconfig")
     lspconfig.slim_lsp = {
       default_config = {
-        cmd = {"/absolute/path/to/slim-lsp/bin/slim-lsp"},
+        cmd = {"slim-lsp"},
         filetypes = {"slim"},
         root_dir = lspconfig.util.root_pattern("Gemfile", ".git"),
         settings = {
@@ -141,7 +166,7 @@ if vim.lsp.enable then vim.lsp.enable('slim_lsp') end
 ## Install From GitHub
 
 ```bash
-git clone https://github.com/<your-user>/slim-lsp.git
+git clone https://github.com/Wixaxis/slim-lsp.git
 cd slim-lsp
 bundle install
 npm install
