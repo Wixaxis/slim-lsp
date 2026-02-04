@@ -60,7 +60,7 @@ module SlimLsp
 
       @warned = true
       @io_err.puts('[slim-lsp] Tailwind class sorting disabled. Run `npm install` in the repo or gem directory.')
-      @io_err.puts(\"[slim-lsp] Tailwind sorter error: #{detail}\") unless detail.to_s.strip.empty?
+      @io_err.puts("[slim-lsp] Tailwind sorter error: #{detail}") unless detail.to_s.strip.empty?
       classes
     end
 

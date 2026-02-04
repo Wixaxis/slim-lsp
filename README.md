@@ -109,6 +109,12 @@ Diagnose syntax errors:
 slim-lsp --diagnose path/to/file.slim
 ```
 
+Example for CI (fail on formatting changes):
+
+```bash
+slim-lsp --format path/to/file.slim --check
+```
+
 Tailwind options for CLI:
 
 ```bash
