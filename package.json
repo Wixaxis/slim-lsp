@@ -1,0 +1,8 @@
+{
+  "name": "slim-lsp-tailwind-helper",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@herb-tools/tailwind-class-sorter": "^2.2.1"
+  }
+}
