@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@herb-tools/tailwind-class-sorter": "^2.2.1"
+    "@herb-tools/tailwind-class-sorter": "^0.8.9"
   }
 }
