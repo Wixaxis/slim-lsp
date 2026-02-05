@@ -36,6 +36,17 @@ module SlimLsp
         'preserveWhitespace' => true,
         'nodePath' => 'node'
       },
+      'lint' => {
+        'enabled' => false,
+        'command' => 'slim-lint',
+        'useBundler' => true,
+        'reporter' => 'json',
+        'configPath' => nil,
+        'includeLinters' => [],
+        'excludeLinters' => [],
+        'exclude' => [],
+        'extraArgs' => []
+      },
       'completion' => {
         'enabled' => true
       }
@@ -252,6 +263,7 @@ module SlimLsp
 
     def publish_diagnostics(uri, text)
       diagnostics = parse_diagnostics(text)
+      diagnostics.concat(slim_lint_diagnostics(uri, text))
       send_notification('textDocument/publishDiagnostics', { uri: uri, diagnostics: diagnostics })
     end
 
@@ -269,6 +281,21 @@ module SlimLsp
         source: 'slim',
         message: message
       }]
+    end
+
+    def slim_lint_diagnostics(uri, text)
+      return [] unless @config.dig('lint', 'enabled')
+
+      path = uri_to_path(uri)
+      return [] unless path && !path.empty?
+
+      runner = SlimLsp::SlimLintRunner.new(
+        config: @config['lint'],
+        workspace_root: @workspace_root,
+        io_err: $stderr
+      )
+
+      runner.run(path, text)
     end
 
     def parse_error_location(error)

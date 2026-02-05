@@ -1,0 +1,2 @@
+app/views/items/index.slim:3 [LineLength] Line is too long
+app/views/items/index.slim:7:1 [ImplicitDiv] Avoid implicit div

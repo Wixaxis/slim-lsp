@@ -1,0 +1,9 @@
+[
+  {
+    "path": "app/views/items/index.slim",
+    "offenses": [
+      { "line": 3, "column": 5, "linter": "LineLength", "message": "Line is too long", "severity": "warning" },
+      { "line": 7, "column": 1, "linter": "ImplicitDiv", "message": "Avoid implicit div", "severity": "error" }
+    ]
+  }
+]

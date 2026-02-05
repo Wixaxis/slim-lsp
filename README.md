@@ -256,6 +256,7 @@ or by running the LSP with an explicit Ruby path.
 ### Diagnostics
 
 On every open/change, the server runs Slim's parser to catch syntax errors and publishes diagnostics.
+If `lint.enabled` is `true`, it will also run `slim-lint` and surface its offenses as diagnostics.
 
 ### Formatting (Tailwind class sort)
 
@@ -279,6 +280,17 @@ You can set configuration via `settings` (preferred) or `initializationOptions`.
     "preserveWhitespace": true,
     "nodePath": "node"
   },
+  "lint": {
+    "enabled": false,
+    "command": "slim-lint",
+    "useBundler": true,
+    "reporter": "json",
+    "configPath": ".slim-lint.yml",
+    "includeLinters": [],
+    "excludeLinters": [],
+    "exclude": [],
+    "extraArgs": []
+  },
   "completion": {
     "enabled": true
   }
@@ -295,3 +307,4 @@ You can set configuration via `settings` (preferred) or `initializationOptions`.
 - Handle Slim shorthand classes (`.foo.bar`) and dynamic class bindings.
 - Incremental diagnostics and smarter completions.
 - Optional tree-sitter based structure hints for better diagnostics.
+- Optional slim-lint integration for richer linting rules.
