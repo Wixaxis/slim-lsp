@@ -65,6 +65,14 @@ class FormatterTest < Minitest::Test
     assert_equal expected, formatted, diff_message(expected, formatted)
   end
 
+  def test_format_matches_fixture_conditional
+    input = File.read(fixture_path('format/input_conditional.slim'))
+    expected = File.read(fixture_path('format/expected_conditional.slim'))
+
+    formatted = formatter.format(input)
+    assert_equal expected, formatted, diff_message(expected, formatted)
+  end
+
   private
 
   def formatter

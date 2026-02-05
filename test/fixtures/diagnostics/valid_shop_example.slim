@@ -1,0 +1,28 @@
+- heading = "My Shop"
+- items = [
+-   {name: 'Calculator', price: 10, available: true},
+-   {name: 'Note Pad', price: 2.5, available: false},
+-   {name: 'Pen', price: 6, available: true}
+- ]
+
+doctype html
+html
+  head
+    title My Shop
+  body
+    h1= heading
+    table
+      thead
+        tr
+          th Item Name
+          th Item Price
+          th Availability
+      tbody
+        - items.each do |item|
+          tr
+            td= item[:name]
+            td= item[:price]
+            - if item[:available]
+              td In Stock
+            - else
+              td.alert Out of Stock

@@ -13,6 +13,26 @@ class DiagnosticsTest < Minitest::Test
     Slim::Engine.new.call(valid)
   end
 
+  def test_slim_parser_accepts_shop_example
+    valid = File.read(fixture_path('diagnostics/valid_shop_example.slim'))
+    Slim::Engine.new.call(valid)
+  end
+
+  def test_slim_parser_accepts_filters
+    valid = File.read(fixture_path('diagnostics/valid_filters.slim'))
+    Slim::Engine.new.call(valid)
+  end
+
+  def test_slim_parser_accepts_attributes
+    valid = File.read(fixture_path('diagnostics/valid_attributes.slim'))
+    Slim::Engine.new.call(valid)
+  end
+
+  def test_slim_parser_raises_on_invalid_attr_wrapper
+    invalid = File.read(fixture_path('diagnostics/invalid_attr_wrapper.slim'))
+    assert_raises(StandardError) { Slim::Engine.new.call(invalid) }
+  end
+
   def test_slim_parser_raises_on_invalid_ruby
     invalid = File.read(fixture_path('diagnostics/invalid_ruby.slim'))
     begin
