@@ -54,7 +54,7 @@ class FormatterTest < Minitest::Test
     expected = File.read(fixture_path('format/expected_simple.slim'))
 
     formatted = formatter.format(input)
-    assert_equal expected, formatted
+    assert_equal expected, formatted, diff_message(expected, formatted)
   end
 
   def test_format_matches_fixture_multi_attrs
@@ -62,7 +62,7 @@ class FormatterTest < Minitest::Test
     expected = File.read(fixture_path('format/expected_multi_attrs.slim'))
 
     formatted = formatter.format(input)
-    assert_equal expected, formatted
+    assert_equal expected, formatted, diff_message(expected, formatted)
   end
 
   private
@@ -77,5 +77,19 @@ class FormatterTest < Minitest::Test
 
   def fixture_path(relative_path)
     File.expand_path(File.join('fixtures', relative_path), __dir__)
+  end
+
+  def diff_message(expected, actual)
+    expected_lines = expected.split("\n", -1)
+    actual_lines = actual.split("\n", -1)
+    message = +"\\n--- expected\\n+++ actual\\n"
+    expected_lines.zip(actual_lines).each_with_index do |(exp, act), index|
+      next if exp == act
+
+      message << "Line #{index + 1}:\n"
+      message << "  - #{exp.inspect}\n"
+      message << "  + #{act.inspect}\n"
+    end
+    message
   end
 end
